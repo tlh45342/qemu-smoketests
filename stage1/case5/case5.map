@@ -1,0 +1,76 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM              0x00000000         0x08000000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD main.o
+LOAD startup.o
+                0x00000000                . = ORIGIN (RAM)
+
+.text           0x00000000      0x1d6
+ *(.vectors)
+ .vectors       0x00000000       0xc4 startup.o
+                0x00000000                _start
+ *(.text*)
+ .text          0x000000c4       0x4c main.o
+                0x000000c4                c_irq_handler
+ .text.startup  0x00000110       0xac main.o
+                0x00000110                main
+ .text          0x000001bc        0x0 startup.o
+ *(.rodata*)
+ .rodata.str1.4
+                0x000001bc       0x1a main.o
+
+.glue_7         0x000001d8        0x0
+ .glue_7        0x000001d8        0x0 linker stubs
+
+.glue_7t        0x000001d8        0x0
+ .glue_7t       0x000001d8        0x0 linker stubs
+
+.vfp11_veneer   0x000001d8        0x0
+ .vfp11_veneer  0x000001d8        0x0 linker stubs
+
+.v4_bx          0x000001d8        0x0
+ .v4_bx         0x000001d8        0x0 linker stubs
+
+.iplt           0x000001d8        0x0
+ .iplt          0x000001d8        0x0 main.o
+
+.rel.dyn        0x000001d8        0x0
+ .rel.iplt      0x000001d8        0x0 main.o
+
+.data           0x000001d8        0x0
+ *(.data*)
+ .data          0x000001d8        0x0 main.o
+ .data          0x000001d8        0x0 startup.o
+
+.igot.plt       0x000001d8        0x0
+ .igot.plt      0x000001d8        0x0 main.o
+
+.bss            0x000001d8        0x0
+                0x000001d8                __bss_start__ = .
+ *(.bss*)
+ .bss           0x000001d8        0x0 main.o
+ .bss           0x000001d8        0x0 startup.o
+ *(COMMON)
+                0x000001d8                __bss_end__ = .
+                0x08000000                __stack_top__ = (ORIGIN (RAM) + LENGTH (RAM))
+                0x08000000                __irq_stack_top__ = __stack_top__
+                0x07fff000                __svc_stack_top__ = (__irq_stack_top__ - 0x1000)
+OUTPUT(case5.elf elf32-littlearm)
+LOAD linker stubs
+
+.comment        0x00000000       0x49
+ .comment       0x00000000       0x49 main.o
+                                 0x4a (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2a
+ .ARM.attributes
+                0x00000000       0x2c main.o
+ .ARM.attributes
+                0x0000002c       0x22 startup.o

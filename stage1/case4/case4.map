@@ -1,0 +1,80 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM              0x00000000         0x08000000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD start.o
+LOAD main.o
+LOAD gfx.o
+                0x00008000                . = 0x8000
+
+.text           0x00000000      0x4c8
+ *(.text.start*)
+ .text.startup  0x00000000      0x308 main.o
+                0x00000000                main
+ *(.text*)
+ .text          0x00000308       0x4c start.o
+                0x00000308                _start
+ .text          0x00000354        0x0 main.o
+ .text          0x00000354       0x74 gfx.o
+                0x00000354                put_px565
+                0x00000368                fill_rect565
+ *(.rodata*)
+ .rodata        0x000003c8      0x100 main.o
+
+.glue_7         0x000004c8        0x0
+ .glue_7        0x000004c8        0x0 linker stubs
+
+.glue_7t        0x000004c8        0x0
+ .glue_7t       0x000004c8        0x0 linker stubs
+
+.vfp11_veneer   0x000004c8        0x0
+ .vfp11_veneer  0x000004c8        0x0 linker stubs
+
+.v4_bx          0x000004c8        0x0
+ .v4_bx         0x000004c8        0x0 linker stubs
+
+.iplt           0x000004c8        0x0
+ .iplt          0x000004c8        0x0 start.o
+
+.rel.dyn        0x000004c8        0x0
+ .rel.iplt      0x000004c8        0x0 start.o
+
+.data           0x000004c8        0x0
+ *(.data*)
+ .data          0x000004c8        0x0 start.o
+ .data          0x000004c8        0x0 main.o
+ .data          0x000004c8        0x0 gfx.o
+
+.igot.plt       0x000004c8        0x0
+ .igot.plt      0x000004c8        0x0 start.o
+
+.bss            0x000004c8        0x0
+                0x000004c8                __bss_start__ = .
+ *(.bss*)
+ .bss           0x000004c8        0x0 start.o
+ .bss           0x000004c8        0x0 main.o
+ .bss           0x000004c8        0x0 gfx.o
+ *(COMMON)
+                0x000004c8                __bss_end__ = .
+                0x07fff000                __stack_top__ = ((ORIGIN (RAM) + LENGTH (RAM)) - 0x1000)
+OUTPUT(case4.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x22 start.o
+ .ARM.attributes
+                0x00000022       0x2c main.o
+ .ARM.attributes
+                0x0000004e       0x2c gfx.o
+
+.comment        0x00000000       0x49
+ .comment       0x00000000       0x49 main.o
+                                 0x4a (size before relaxing)
+ .comment       0x00000049       0x4a gfx.o
